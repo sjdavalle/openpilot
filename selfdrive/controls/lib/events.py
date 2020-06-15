@@ -190,8 +190,6 @@ EVENTS = {
   EventName.gasPressed: {ET.PRE_ENABLE: None},
 
   EventName.wrongCruiseMode: {},
-  EventName.laneChangeBlocked: {},
-
   EventName.focusRecoverActive: {},
 
   # ********** events only containing alerts displayed in all states **********
