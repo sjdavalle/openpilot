@@ -48,6 +48,8 @@ nosetests -s selfdrive/test/test_openpilot.py
 
 # Cleanup
 find . -name '*.pyc' -delete
+find . -name '*.os' -delete
+find . -name '*.o' -delete
 rm .sconsign.dblite
 
 # Mark as prebuilt release
