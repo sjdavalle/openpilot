@@ -17,7 +17,6 @@ cd /data/openpilot
 git init
 git remote add origin git@github.com:commaai/openpilot.git
 git fetch origin devel
-git fetch origin master-ci
 git fetch origin release2-staging
 git fetch origin dashcam-staging
 
@@ -26,8 +25,7 @@ git fetch origin dashcam-staging
 #git clean -xdf
 
 # Create release2 with no history
-#git checkout --orphan release2-staging origin/devel
-git checkout --orphan release2-staging origin/master-ci
+git checkout --orphan release2-staging origin/devel
 
 VERSION=$(cat selfdrive/common/version.h | awk -F\" '{print $2}')
 git commit -m "openpilot v$VERSION"
@@ -52,6 +50,8 @@ nosetests -s selfdrive/test/test_openpilot.py
 find . -name '*.pyc' -delete
 find . -name '*.os' -delete
 find . -name '*.o' -delete
+find . -name '*.a' -delete
+find . -name '__pycache__' -delete
 rm -rf opendbc/can/dbc_out/*
 rm .sconsign.dblite
 
@@ -63,10 +63,10 @@ git add -f .
 git commit --amend -m "openpilot v$VERSION"
 
 # Push to release2-staging
-git push -f origin test_release_cleanup
+git push -f origin release2-staging
 
 # Create dashcam release
 git rm selfdrive/car/*/carcontroller.py
 
-#git commit -m "create dashcam release from release2"
-#git push -f origin release2-staging:dashcam-staging
+git commit -m "create dashcam release from release2"
+git push -f origin release2-staging:dashcam-staging
