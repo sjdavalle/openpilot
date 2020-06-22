@@ -44,6 +44,8 @@ def keyboard_poll_thread(q):
       q.put(str("cruise_down"))
     if c == '3':
       q.put(str("cruise_cancel"))
+    if c == 'b':
+      q.put(str("break_1"))
     if c == 'q':
       exit(0)
 
