@@ -22,8 +22,8 @@ namespace {
 
 struct ProcCache {
   std::string name;
-  std::vector<std::string> cmdline;
   std::string exe;
+  std::vector<std::string> cmdline;
 };
 
 }

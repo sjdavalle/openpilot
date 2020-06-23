@@ -159,7 +159,7 @@ int write_db_value(const char* key, const char* value, size_t value_size, bool p
   if (result < 0) {
     goto cleanup;
   }
-  lock_fd = open(path, O_CREAT);
+  lock_fd = open(path, O_CREAT, 0600);
 
   // Build key path
   result = snprintf(path, sizeof(path), "%s/d/%s", params_path, key);
@@ -227,7 +227,7 @@ int delete_db_value(const char* key, bool persistent_param) {
   if (result < 0) {
     goto cleanup;
   }
-  lock_fd = open(path, O_CREAT);
+  lock_fd = open(path, O_CREAT, 0600);
 
   // Take lock.
   result = flock(lock_fd, LOCK_EX);

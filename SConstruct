@@ -36,6 +36,7 @@ if arch == "aarch64" or arch == "larch64":
   ]
 
   libpath = [
+    "/usr/local/lib",
     "/usr/lib",
     "/data/data/com.termux/files/usr/lib",
     "/system/vendor/lib64",
@@ -114,8 +115,11 @@ env = Environment(
     "-fPIC",
     "-O2",
     "-Werror",
+    "-Wno-c99-designator",
     "-Wno-deprecated-register",
-    "-Wno-inconsistent-missing-override",
+    #"-Wno-error=terminate"
+    #"-Wno-deprecated-register",
+    #"-Wno-inconsistent-missing-override",
   ] + cflags + ccflags_asan,
 
   CPPPATH=cpppath + [
@@ -159,6 +163,9 @@ env = Environment(
     "#phonelibs",
   ]
 )
+
+if webcam:
+  env.Append(CPPDEFINES=['CL_USE_DEPRECATED_OPENCL_1_2_APIS'])
 
 if os.environ.get('SCONS_CACHE'):
   CacheDir('/tmp/scons_cache')
@@ -204,7 +211,7 @@ Import('_common', '_visionipc', '_gpucommon', '_gpu_libs')
 if SHARED:
   common, visionipc, gpucommon = abspath(common), abspath(visionipc), abspath(gpucommon)
 else:
-  common = [_common, 'json11']
+  common = [_common, ['json11','zmq']]
   visionipc = _visionipc
   gpucommon = [_gpucommon] + _gpu_libs
 

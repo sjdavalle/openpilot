@@ -8,6 +8,7 @@
 
 #include <pthread.h>
 #include <zmq.h>
+#include <cstdarg>
 
 #include "json11.hpp"
 
@@ -15,6 +16,8 @@
 #include "common/version.h"
 
 #include "swaglog.h"
+
+#include <cstdarg>
 
 typedef struct LogState {
   pthread_mutex_t lock;
@@ -71,10 +74,10 @@ void cloudlog_e(int levelnum, const char* filename, int lineno, const char* func
   char* msg_buf = NULL;
   va_list args;
   va_start(args, fmt);
-  vasprintf(&msg_buf, fmt, args);
+  int result = vasprintf(&msg_buf, fmt, args);
   va_end(args);
 
-  if (!msg_buf) {
+  if (result == -1 || !msg_buf) {
     pthread_mutex_unlock(&s.lock);
     return;
   }

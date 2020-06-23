@@ -28,11 +28,13 @@ static void ui_set_brightness(UIState *s, int brightness) {
 
 int event_processing_enabled = -1;
 static void enable_event_processing(bool yes) {
+  int result;
+  //TODO: check the result after calling system
   if (event_processing_enabled != 1 && yes) {
-    system("service call window 18 i32 1");  // enable event processing
+    result = system("service call window 18 i32 1");  // enable event processing
     event_processing_enabled = 1;
   } else if (event_processing_enabled != 0 && !yes) {
-    system("service call window 18 i32 0");  // disable event processing
+    result = system("service call window 18 i32 0");  // disable event processing
     event_processing_enabled = 0;
   }
 }

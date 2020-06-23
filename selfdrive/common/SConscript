@@ -1,11 +1,13 @@
-Import('env', 'arch', 'SHARED', 'QCOM_REPLAY')
+Import('env', 'arch', 'zmq', 'SHARED', 'QCOM_REPLAY')
 
 if SHARED:
   fxn = env.SharedLibrary
 else:
   fxn = env.Library
 
-_common = fxn('common', ['params.cc', 'swaglog.cc', 'util.c', 'cqueue.c'], LIBS="json11")
+#_common = fxn('common', ['params.cc', 'swaglog.cc', 'util.c', 'cqueue.c'], LIBS="json11")
+_common = fxn('common', ['params.cc', 'swaglog.cc', 'util.c', 'cqueue.c'], LIBS=['json11', 'zmq'])
+
 _visionipc = fxn('visionipc', ['visionipc.c', 'ipc.c'])
 
 files = [

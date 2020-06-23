@@ -202,27 +202,24 @@ void front_thread(CameraState *s) {
 
 }  // namespace
 
-CameraInfo cameras_supported[CAMERA_ID_MAX] = {
-  // road facing
-  [CAMERA_ID_LGC920] = {
-      .frame_width = FRAME_WIDTH,
-      .frame_height = FRAME_HEIGHT,
-      .frame_stride = FRAME_WIDTH*3,
-      .bayer = false,
-      .bayer_flip = false,
-  },
-  // driver facing
-  [CAMERA_ID_LGC615] = {
-      .frame_width = FRAME_WIDTH_FRONT,
-      .frame_height = FRAME_HEIGHT_FRONT,
-      .frame_stride = FRAME_WIDTH_FRONT*3,
-      .bayer = false,
-      .bayer_flip = false,
-  },
-};
+CameraInfo cameras_supported[CAMERA_ID_MAX];
 
 void cameras_init(DualCameraState *s) {
   memset(s, 0, sizeof(*s));
+
+  // road facing
+  cameras_supported [CAMERA_ID_LGC920].frame_width = FRAME_WIDTH;
+  cameras_supported [CAMERA_ID_LGC920].frame_height = FRAME_HEIGHT;
+  cameras_supported [CAMERA_ID_LGC920].frame_stride = FRAME_WIDTH*3;
+  cameras_supported [CAMERA_ID_LGC920].bayer = false;
+  cameras_supported [CAMERA_ID_LGC920].bayer_flip = false;
+
+  // driver facing
+  cameras_supported [CAMERA_ID_LGC615].frame_width = FRAME_WIDTH_FRONT;
+  cameras_supported [CAMERA_ID_LGC615].frame_height = FRAME_HEIGHT_FRONT;
+  cameras_supported [CAMERA_ID_LGC615].frame_stride = FRAME_WIDTH_FRONT*3;
+  cameras_supported [CAMERA_ID_LGC615].bayer = false;
+  cameras_supported [CAMERA_ID_LGC615].bayer_flip = false;
 
   camera_init(&s->rear, CAMERA_ID_LGC920, 20);
   s->rear.transform = (mat3){{
