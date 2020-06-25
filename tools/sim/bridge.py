@@ -27,9 +27,9 @@ W, H = 1164, 874
 def cam_callback(image):
   img = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
   img = np.reshape(img, (H, W, 4))
-  img = img[:, :, :3]
-  img = img[:, :, ::-1]
-  # img = img[:, :, [0, 1, 2]].copy()
+  #img = img[:, :, :3]
+  #img = img[:, :, ::-1]
+  img = img[:, :, [0, 1, 2]].copy()
 
   #print(img.tostring())
 
@@ -42,7 +42,7 @@ def cam_callback(image):
   pm.send('frame', dat)
 
 def imu_callback(imu):
-  print(imu, imu.accelerometer)
+  #print(imu, imu.accelerometer)
 
   dat = messaging.new_message('sensorEvents', 2)
   dat.sensorEvents[0].sensor = 4
@@ -85,9 +85,7 @@ def go(q):
   threading.Thread(target=fake_driver_monitoring).start()
 
   world = None
-  camera = None
-  vehicle = None
-  imu = None
+  actor_list = []
 
   try:
     client = carla.Client("127.0.0.1", 2000)
@@ -108,50 +106,47 @@ def go(q):
 
     # Get a random blueprint.
     vehicle_bp = random.choice(blueprint_library.filter("vehicle.*"))
-    vehicle_bp.set_attribute('role_name', 'hero')
     if vehicle_bp.has_attribute('color'):
         color = random.choice(vehicle_bp.get_attribute('color').recommended_values)
         vehicle_bp.set_attribute('color', color)
 
-    while vehicle is None:
-      spawn_points = world_map.get_spawn_points()
-      spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
-      vehicle = world.try_spawn_actor(vehicle_bp, spawn_point)
-
+    vehicle_transform = random.choice(world_map.get_spawn_points())
+    vehicle = world.try_spawn_actor(vehicle_bp, vehicle_transform)
     if args.autopilot:
       vehicle.set_autopilot(True)
     
+    actor_list.append(vehicle)
     print(vehicle.get_speed_limit())
-    if vehicle is not None:
-      print("\n\n -- > vehicle has been configured!!!")
 
     # make tires less slippery
-    wheel_control = carla.WheelPhysicsControl(tire_friction=5)
-    physics_control = vehicle.get_physics_control()
-    physics_control.mass = 1326
-    physics_control.wheels = [wheel_control]*4
-    physics_control.torque_curve = [[20.0, 500.0], [5000.0, 500.0]]
-    physics_control.gear_switch_time = 0.0
-    vehicle.apply_physics_control(physics_control)
+    # wheel_control = carla.WheelPhysicsControl(tire_friction=5)
+    # physics_control = vehicle.get_physics_control()
+    # physics_control.mass = 1326
+    # physics_control.wheels = [wheel_control]*4
+    # physics_control.torque_curve = [[20.0, 500.0], [5000.0, 500.0]]
+    # physics_control.gear_switch_time = 0.0
+    # vehicle.apply_physics_control(physics_control)
 
-    blueprint = blueprint_library.find('sensor.camera.rgb')
-    blueprint.set_attribute('image_size_x', str(W))
-    blueprint.set_attribute('image_size_y', str(H))
-    blueprint.set_attribute('fov', '70')
-    blueprint.set_attribute('sensor_tick', '0.05')
-    #transform = carla.Transform(carla.Location(x=0.8, z=1.45))
+    print('created %s' % vehicle.type_id)
 
-    transform = [carla.Transform(carla.Location(x=-5.5, z=2.8), carla.Rotation(pitch=-15)),
-    carla.Transform(carla.Location(x=1.6, z=1.7))]
+    camera_bp = blueprint_library.find('sensor.camera.rgb')
+    camera_bp.set_attribute('image_size_x', str(W))
+    camera_bp.set_attribute('image_size_y', str(H))
+    camera_bp.set_attribute('fov', '70')
+    camera_bp.set_attribute('sensor_tick', '0.05')
 
-    camera = world.spawn_actor(blueprint, transform[0], attach_to=vehicle)
+    camera_transform = carla.Transform(carla.Location(x=0.8, z=1.45))
+    camera = world.try_spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
+    actor_list.append(camera)
     camera.listen(cam_callback)
+    print('created %s' % camera.type_id)
   
     # reenable IMU
     imu_bp = blueprint_library.find('sensor.other.imu')
-    imu = world.spawn_actor(imu_bp, transform[0], attach_to=vehicle)
-    
+    imu = world.try_spawn_actor(imu_bp, carla.Transform(), attach_to=vehicle)
     imu.listen(imu_callback)
+    print('created %s' % imu.type_id)
+    actor_list.append(imu)
 
     # can loop
     sendcan = messaging.sub_sock('sendcan')
@@ -169,10 +164,10 @@ def go(q):
     brake_out = 1
     steer_angle_out = 0
 
-    vc = carla.VehicleControl(throttle=throttle_out, 
-                              steer=steer_angle_out / 3.14, 
-                              brake=brake_out, 
-                              reverse=in_reverse)
+    vc = carla.VehicleControl()#throttle=throttle_out, 
+                              #steer=steer_angle_out / 3.14, 
+                              #brake=brake_out, 
+                              #reverse=in_reverse)
 
     print ("vehicle control created!!!")
 
@@ -236,12 +231,10 @@ def go(q):
       rk.keep_time()
 
   finally:
-      if vehicle is not None:
-        vehicle.destroy()
-      if camera is not None:
-        camera.destroy()
-      if imu is not None:
-        imu.destroy()
+        print('destroying actors')
+        for actor in actor_list:
+            actor.destroy()
+        print('done.')
 
 if __name__ == "__main__":
   params = Params()

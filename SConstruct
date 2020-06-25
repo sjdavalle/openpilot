@@ -117,9 +117,11 @@ env = Environment(
     "-Werror",
     "-Wno-c99-designator",
     "-Wno-deprecated-register",
+    "-Wno-reorder-init-list",
+    #"-Wno-inconsistent-missing-override",
     #"-Wno-error=terminate"
     #"-Wno-deprecated-register",
-    #"-Wno-inconsistent-missing-override",
+    "-Wno-inconsistent-missing-override",
   ] + cflags + ccflags_asan,
 
   CPPPATH=cpppath + [
