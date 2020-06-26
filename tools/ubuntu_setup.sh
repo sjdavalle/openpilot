@@ -109,3 +109,7 @@ sudo ldconfig
 sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main"
 sudo apt-get update
 sudo apt install clang
+
+#install capnp
+cd ../cereal/
+sudo ./install_capnp.sh
