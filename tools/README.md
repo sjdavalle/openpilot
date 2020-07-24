@@ -38,9 +38,10 @@ Setup
     sudo mkdir /data/params
     sudo chown $USER /data/params
     ```
+4. Cross-compilation instructions [here](cross-compilation.md)
 
 
-4. Try out some tools!
+5. Try out some tools!
 
 
 Tool examples

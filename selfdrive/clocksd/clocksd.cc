@@ -6,6 +6,7 @@
 #include <utils/Timers.h>
 #include "messaging.hpp"
 #include "common/timing.h"
+#include <cassert>
 
 namespace {
   int64_t arm_cntpct() {

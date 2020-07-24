@@ -1,4 +1,4 @@
-Import('env', 'arch', 'common', 'messaging', 'gpucommon', 'visionipc', 'cereal')
+Import('env', 'arch', 'common', 'messaging', 'gpucommon', 'visionipc', 'cereal', 'cc')
 
 src = ['ui.cc', 'paint.cc', 'sidebar.cc', '#phonelibs/nanovg/nanovg.c']
 libs = [common, 'zmq', 'czmq', 'capnp', 'kj', 'm', cereal, messaging, gpucommon, visionipc]
@@ -10,7 +10,10 @@ if arch == "aarch64":
 else:
   src += ['linux.cc']
   libs += ['pthread', 'glfw']
-  linkflags = []
+  if cc:
+    linkflags = env['LINKFLAGS']
+  else:
+    linkflags = []
 
 env.Program('_ui', src,
   LINKFLAGS=linkflags,
