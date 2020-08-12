@@ -217,7 +217,8 @@ if webcam:
 
 if is_ubuntu:
   env.Append(CCFLAGS=["-Wno-c99-designator",
-                      "-Wno-reorder-init-list"])
+                      "-Wno-reorder-init-list",
+                      "-Wno-unused-variable",])
 
 if os.environ.get('SCONS_CACHE'):
   cache_dir = '/tmp/scons_cache'
